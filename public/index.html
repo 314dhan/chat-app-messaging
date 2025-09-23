@@ -10,27 +10,42 @@
 <body>
 
   <div id="app">
-    <h1 class="main-title">
-      <span>{{ title }}</span>
-      <button class="delete-all-btn" @click="deleteAllMessages">Hapus Semua Chat</button>
-    </h1>
-    
+    <div class="main-title">
+      <h1>
+        <i class="fas fa-comments title-icon"></i>
+        <span>{{ title }}</span>
+      </h1>
+      <div class="online-indicator">
+        <div class="online-dot"></div>
+        Online
+      </div>
+      <button class="delete-all-btn" @click="deleteAllMessages">
+        <i class="fas fa-trash-alt"></i>
+        Hapus Semua
+      </button>
+    </div>
+  
     <div id="messages-container">
-      <div class="message" 
-           v-for="(msg, index) in messages" 
-           :key="msg.timestamp"
-           :class="{ 'is-continuation': index > 0 && messages[index - 1].username === msg.username }">
+      <div v-if="messages.length === 0" class="empty-state">
+        <i class="fas fa-comment-dots"></i>
+        <p>Belum ada pesan.<br>Mulai percakapan dengan mengirim pesan pertama!</p>
+      </div>
+      <div class="message" v-for="(msg, index) in messages" :key="msg.timestamp"
+        :class="{ 'is-continuation': index > 0 && messages[index - 1].username === msg.username }">
         <div class="username" v-if="index === 0 || messages[index - 1].username !== msg.username">
           {{ msg.username }}
         </div>
         <div class="text">{{ msg.text }}</div>
       </div>
     </div>
-
+  
     <form id="message-form" @submit.prevent="sendMessage">
-      <input type="text" id="username-input" placeholder="Enter your name" required v-model="currentUser" autocomplete="off">
-      <input type="text" id="message-input" placeholder="Type a message..." required v-model="newMessage" autocomplete="off">
-      <button type="submit">Send</button>
+      <input type="text" id="username-input" placeholder="Nama Anda" required v-model="currentUser" autocomplete="off">
+      <input type="text" id="message-input" placeholder="Ketik pesan..." required v-model="newMessage" autocomplete="off">
+      <button type="submit">
+        <i class="fas fa-paper-plane"></i>
+        Kirim
+      </button>
     </form>
   </div>
 
