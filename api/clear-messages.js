@@ -1,13 +1,9 @@
-const { createClient } = require('@vercel/kv');
+const fs = require('fs');
+const DB_PATH = '/tmp/db.json';
 
 module.exports = async (req, res) => {
   try {
-    const kv = createClient({
-      url: process.env.KV_REST_API_URL,
-      token: process.env.KV_REST_API_TOKEN,
-    });
-
-    await kv.set('chat_messages', []);
+    fs.writeFileSync(DB_PATH, JSON.stringify({ messages: [] }, null, 2));
     res.status(200).send('Messages cleared successfully.');
   } catch (error) {
     console.error('Error clearing messages:', error);

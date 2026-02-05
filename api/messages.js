@@ -1,18 +1,22 @@
-const { createClient } = require('@vercel/kv');
+const fs = require('fs');
+const path = require('path');
 
-const kv = createClient({
-  url: process.env.KV_REST_API_URL,
-  token: process.env.KV_REST_API_TOKEN,
-});
+// Di Vercel, kita harus menggunakan folder /tmp untuk menulis file
+const DB_PATH = '/tmp/db.json';
+
+// Inisialisasi file jika belum ada
+if (!fs.existsSync(DB_PATH)) {
+  fs.writeFileSync(DB_PATH, JSON.stringify({ messages: [] }, null, 2));
+}
 
 module.exports = async (req, res) => {
   if (req.method === 'GET') {
     try {
-      const messages = await kv.get('chat_messages') || [];
-      return res.status(200).json(messages);
+      const data = fs.readFileSync(DB_PATH, 'utf8');
+      const db = JSON.parse(data);
+      return res.status(200).json(db.messages);
     } catch (error) {
-      console.error('Error fetching messages:', error);
-      return res.status(500).send('Error fetching messages.');
+      return res.status(500).send('Error reading database.');
     }
   }
 
@@ -24,27 +28,25 @@ module.exports = async (req, res) => {
         timestamp: new Date().toISOString()
       };
 
-      const messages = await kv.get('chat_messages') || [];
-      messages.push(newMessage);
-      await kv.set('chat_messages', messages);
-
+      const data = fs.readFileSync(DB_PATH, 'utf8');
+      const db = JSON.parse(data);
+      db.messages.push(newMessage);
+      
+      fs.writeFileSync(DB_PATH, JSON.stringify(db, null, 2));
       return res.status(201).json(newMessage);
     } catch (error) {
-      console.error('Error saving message:', error);
       return res.status(500).send('Error saving message.');
     }
   }
 
   if (req.method === 'DELETE') {
     try {
-      await kv.set('chat_messages', []);
+      fs.writeFileSync(DB_PATH, JSON.stringify({ messages: [] }, null, 2));
       return res.status(200).send('All messages deleted.');
     } catch (error) {
-      console.error('Error deleting messages:', error);
-      return res.status(500).send('Error deleting messages.');
+      return res.status(500).send('Error clearing database.');
     }
   }
 
-  res.setHeader('Allow', ['GET', 'POST', 'DELETE']);
-  res.status(405).end(`Method ${req.method} Not Allowed`);
+  res.status(405).end();
 };
