@@ -1,4 +1,5 @@
 {
+  "version": 2,
   "crons": [
     {
       "path": "/api/clear-messages",
@@ -11,8 +12,8 @@
       "destination": "/api/messages"
     },
     {
-      "source": "/api/clear-messages",
-      "destination": "/api/clear-messages"
+      "source": "/",
+      "destination": "/public/index.html"
     },
     {
       "source": "/(.*)",
