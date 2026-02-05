@@ -7,12 +7,16 @@
   ],
   "rewrites": [
     {
-      "source": "/",
-      "destination": "/public/index.html"
-    },
-    {
       "source": "/messages",
       "destination": "/api/messages"
+    },
+    {
+      "source": "/api/clear-messages",
+      "destination": "/api/clear-messages"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/public/$1"
     }
   ]
 }
