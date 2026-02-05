@@ -59,6 +59,18 @@ app.delete('/messages', (req, res) => {
   });
 });
 
+// Clear database every 24 hours (86400000 ms)
+setInterval(() => {
+  const emptyDb = { messages: [] };
+  fs.writeFile(DB_PATH, JSON.stringify(emptyDb, null, 2), 'utf8', (err) => {
+    if (err) {
+      console.error('Error auto-clearing database:', err);
+    } else {
+      console.log('Database auto-cleared (24h interval).');
+    }
+  });
+}, 86400000);
+
 // Start server
 app.listen(PORT, () => {
   console.log(`Server is running on http://localhost:${PORT}`);
